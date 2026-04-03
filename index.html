@@ -22,148 +22,134 @@
     --radius-lg: 14px;
   }
 
-  body {
-    font-family: 'Noto Sans JP', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  /* ── Header ── */
+  /* Header */
   .site-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; display: flex; align-items: center; justify-content: space-between;
+    height: 56px; position: sticky; top: 0; z-index: 10;
   }
-  .logo { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px; }
+  .logo { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
   .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+
+  /* View toggle */
+  .view-toggle { display: flex; background: var(--surface2); border-radius: var(--radius); padding: 3px; gap: 2px; }
+  .toggle-btn {
+    background: none; border: none; border-radius: 7px; padding: 5px 12px;
+    font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer;
+    color: var(--text2); transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+  }
+  .toggle-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .toggle-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
   .add-btn {
-    background: var(--text);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: opacity 0.15s;
+    background: var(--text); color: #fff; border: none; border-radius: var(--radius);
+    padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit;
+    cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.15s;
   }
   .add-btn:hover { opacity: 0.82; }
 
-  /* ── Main ── */
-  .main { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+  .main { max-width: 880px; margin: 0 auto; padding: 28px 20px 60px; }
 
-  /* ── Stats ── */
+  /* Stats */
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
   .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
   .stat-num { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
   .stat-label { font-size: 11px; color: var(--text2); margin-top: 5px; }
 
-  /* ── Calendar nav ── */
-  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  /* LIST VIEW */
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .filter-btn {
+    font-size: 12px; padding: 5px 14px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text2); cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.12s;
+  }
+  .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+  .event-list { display: flex; flex-direction: column; gap: 10px; }
+  .event-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 16px 18px; cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  .event-card:hover { border-color: var(--border2); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .event-name { font-size: 15px; font-weight: 700; color: var(--text); }
+  .event-date-text { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .card-badges { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 500; white-space: nowrap; }
+  .badge.applied      { background: #d4edbd; color: #2d5a1a; }
+  .badge.pending      { background: #fde5b0; color: #6b3f0a; }
+  .badge.not-applied  { background: #e5e2da; color: #4a4844; }
+  .badge.rejected     { background: #fcd4d4; color: #7a2020; }
+  .badge.hotel-booked    { background: #c8ede0; color: #115038; }
+  .badge.hotel-searching { background: #fde5b0; color: #6b3f0a; }
+  .badge.hotel-none      { background: #e5e2da; color: #4a4844; }
+  .card-meta { display: flex; gap: 20px; border-top: 1px solid var(--border); padding-top: 10px; flex-wrap: wrap; }
+  .card-meta-item { font-size: 12px; color: var(--text2); }
+  .card-meta-item span { color: var(--text); font-weight: 500; }
+  .empty { text-align: center; padding: 48px 16px; color: var(--text2); font-size: 14px; }
+
+  /* CALENDAR VIEW */
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
   .month-nav { display: flex; align-items: center; gap: 10px; }
   .nav-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    width: 32px; height: 32px;
-    cursor: pointer;
-    font-size: 16px;
-    color: var(--text2);
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.1s;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    width: 32px; height: 32px; cursor: pointer; font-size: 16px; color: var(--text2);
+    display: flex; align-items: center; justify-content: center; transition: background 0.1s;
   }
   .nav-btn:hover { background: var(--surface2); }
   .month-label { font-size: 17px; font-weight: 700; color: var(--text); min-width: 110px; text-align: center; }
-
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; }
   .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
   .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
-  /* ── Calendar grid ── */
   .cal-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
   .dow-row { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); background: var(--surface2); border-bottom: 1px solid var(--border); }
   .dow { font-size: 11px; font-weight: 500; color: var(--text2); text-align: center; padding: 9px 0; }
   .dow:first-child { color: #c0533a; }
-  .dow:last-child { color: #3a7ec0; }
+  .dow:last-child  { color: #3a7ec0; }
 
   .days-grid { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); }
   .day-cell {
-    border-top: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    min-height: 88px;
-    padding: 6px 5px 4px;
-    cursor: pointer;
-    transition: background 0.1s;
-    position: relative;
+    border-top: 1px solid var(--border); border-right: 1px solid var(--border);
+    min-height: 90px; padding: 6px 5px 4px; cursor: pointer; transition: background 0.1s;
   }
   .day-cell:hover { background: var(--surface2); }
   .day-cell:nth-child(7n) { border-right: none; }
   .day-cell.other-month { background: #faf9f7; }
   .day-cell.other-month .day-num { color: var(--text3); }
-
   .day-num {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text);
-    width: 22px; height: 22px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    margin-bottom: 3px;
-    flex-shrink: 0;
+    font-size: 12px; font-weight: 500; color: var(--text);
+    width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; margin-bottom: 3px;
   }
-  .day-cell.today .day-num { background: var(--accent); color: #fff; }
-  .day-cell.sunday .day-num { color: #c0533a; }
+  .day-cell.today .day-num { background: var(--accent); color: #fff !important; }
+  .day-cell.sunday .day-num   { color: #c0533a; }
   .day-cell.saturday .day-num { color: #3a7ec0; }
-  .day-cell.today .day-num { color: #fff !important; }
 
   .ev-chip {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 500;
-    line-height: 1.5;
-    cursor: pointer;
+    font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-weight: 500; line-height: 1.5; cursor: pointer;
   }
-  .ev-chip.applied   { background: #d4edbd; color: #2d5a1a; }
-  .ev-chip.pending   { background: #fde5b0; color: #6b3f0a; }
-  .ev-chip.not-applied { background: #e5e2da; color: #4a4844; }
-  .ev-chip.rejected  { background: #fcd4d4; color: #7a2020; }
-  .ev-chip.cont { opacity: 0.5; }
+  .ev-chip.applied      { background: #d4edbd; color: #2d5a1a; }
+  .ev-chip.pending      { background: #fde5b0; color: #6b3f0a; }
+  .ev-chip.not-applied  { background: #e5e2da; color: #4a4844; }
+  .ev-chip.rejected     { background: #fcd4d4; color: #7a2020; }
+  .ev-chip.cont { opacity: 0.45; }
 
-  /* ── Modal ── */
+  /* Modal */
   .modal-backdrop {
-    position: fixed; inset: 0;
-    background: rgba(26,25,22,0.4);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 200;
-    padding: 16px;
+    position: fixed; inset: 0; background: rgba(26,25,22,0.4);
+    display: flex; align-items: center; justify-content: center; z-index: 200; padding: 16px;
     animation: fadein 0.15s ease;
   }
   @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
   .modal {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    padding: 24px;
-    width: min(480px, 100%);
-    max-height: 90vh;
-    overflow-y: auto;
+    background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border);
+    padding: 24px; width: min(480px, 100%); max-height: 90vh; overflow-y: auto;
     animation: slidein 0.18s ease;
   }
   @keyframes slidein { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -172,49 +158,35 @@
   .form-group { margin-bottom: 14px; }
   .form-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; display: block; font-weight: 500; }
   .form-input, .form-select {
-    width: 100%; padding: 9px 11px;
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    font-size: 13px;
-    background: var(--surface);
-    color: var(--text);
-    font-family: inherit;
-    transition: border-color 0.15s;
+    width: 100%; padding: 9px 11px; border: 1px solid var(--border2); border-radius: var(--radius);
+    font-size: 13px; background: var(--surface); color: var(--text); font-family: inherit; transition: border-color 0.15s;
   }
   .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; align-items: center; }
-  .btn { border-radius: var(--radius); padding: 9px 18px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; transition: opacity 0.15s; }
+  .btn { border-radius: var(--radius); padding: 9px 18px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; }
   .btn-cancel { background: none; border: 1px solid var(--border2); color: var(--text2); }
   .btn-cancel:hover { background: var(--surface2); }
-  .btn-save { background: var(--text); color: #fff; border: none; }
+  .btn-save { background: var(--text); color: #fff; border: none; transition: opacity 0.15s; }
   .btn-save:hover { opacity: 0.82; }
   .btn-delete { background: none; border: 1px solid #f0c0c0; color: #b03030; margin-right: auto; }
   .btn-delete:hover { background: #fff0f0; }
 
-  /* Detail */
   .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
   .detail-row:last-child { border-bottom: none; }
   .detail-key { color: var(--text2); }
   .detail-val { color: var(--text); font-weight: 500; }
-  .badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
-  .badge.applied   { background: #d4edbd; color: #2d5a1a; }
-  .badge.pending   { background: #fde5b0; color: #6b3f0a; }
-  .badge.not-applied { background: #e5e2da; color: #4a4844; }
-  .badge.rejected  { background: #fcd4d4; color: #7a2020; }
-  .badge.hotel-booked    { background: #c8ede0; color: #115038; }
-  .badge.hotel-searching { background: #fde5b0; color: #6b3f0a; }
-  .badge.hotel-none      { background: #e5e2da; color: #4a4844; }
 
-  /* Mobile */
-  @media (max-width: 520px) {
+  @media (max-width: 560px) {
     .stats { grid-template-columns: repeat(2, 1fr); }
     .form-row { grid-template-columns: 1fr; }
-    .day-cell { min-height: 58px; }
+    .day-cell { min-height: 60px; }
     .ev-chip { font-size: 9px; }
-    .site-header { padding: 0 16px; }
-    .main { padding: 20px 12px 60px; }
+    .site-header { padding: 0 14px; }
+    .add-btn-label { display: none; }
+    .main { padding: 18px 12px 60px; }
+    .toggle-label { display: none; }
   }
 </style>
 </head>
@@ -222,87 +194,115 @@
 
 <header class="site-header">
   <div class="logo"><div class="logo-dot"></div>ハンドメイドイベント管理</div>
-  <button class="add-btn" onclick="openFormModal(null,null)">＋ イベントを追加</button>
+  <div class="header-right">
+    <div class="view-toggle">
+      <button class="toggle-btn active" id="btn-list" onclick="setView('list')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/>
+        </svg>
+        <span class="toggle-label">リスト</span>
+      </button>
+      <button class="toggle-btn" id="btn-cal" onclick="setView('cal')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="2" width="12" height="12" rx="2"/>
+          <line x1="2" y1="6" x2="14" y2="6"/>
+          <line x1="6" y1="2" x2="6" y2="6"/>
+          <line x1="10" y1="2" x2="10" y2="6"/>
+        </svg>
+        <span class="toggle-label">カレンダー</span>
+      </button>
+    </div>
+    <button class="add-btn" onclick="openFormModal(null,null)">＋ <span class="add-btn-label">イベントを追加</span></button>
+  </div>
 </header>
 
 <main class="main">
   <div class="stats" id="stats"></div>
 
-  <div class="cal-header">
-    <div class="month-nav">
-      <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
-      <div class="month-label" id="month-label"></div>
-      <button class="nav-btn" onclick="changeMonth(1)">›</button>
+  <!-- LIST VIEW -->
+  <div id="list-view">
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">すべて</button>
+      <button class="filter-btn" onclick="setFilter('applied',this)">申込済</button>
+      <button class="filter-btn" onclick="setFilter('pending',this)">検討中</button>
+      <button class="filter-btn" onclick="setFilter('not-applied',this)">未申込</button>
+      <button class="filter-btn" onclick="setFilter('rejected',this)">落選</button>
     </div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#d4edbd"></div>申込済</div>
-      <div class="leg"><div class="leg-dot" style="background:#fde5b0"></div>検討中</div>
-      <div class="leg"><div class="leg-dot" style="background:#e5e2da"></div>未申込</div>
-      <div class="leg"><div class="leg-dot" style="background:#fcd4d4"></div>落選</div>
-    </div>
+    <div class="event-list" id="event-list"></div>
   </div>
 
-  <div class="cal-wrap">
-    <div class="dow-row">
-      <div class="dow">日</div><div class="dow">月</div><div class="dow">火</div>
-      <div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow">土</div>
+  <!-- CALENDAR VIEW -->
+  <div id="cal-view" style="display:none">
+    <div class="cal-header">
+      <div class="month-nav">
+        <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="month-label" id="month-label"></div>
+        <button class="nav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+      <div class="legend">
+        <div class="leg"><div class="leg-dot" style="background:#d4edbd"></div>申込済</div>
+        <div class="leg"><div class="leg-dot" style="background:#fde5b0"></div>検討中</div>
+        <div class="leg"><div class="leg-dot" style="background:#e5e2da"></div>未申込</div>
+        <div class="leg"><div class="leg-dot" style="background:#fcd4d4"></div>落選</div>
+      </div>
     </div>
-    <div class="days-grid" id="days-grid"></div>
+    <div class="cal-wrap">
+      <div class="dow-row">
+        <div class="dow">日</div><div class="dow">月</div><div class="dow">火</div>
+        <div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow">土</div>
+      </div>
+      <div class="days-grid" id="days-grid"></div>
+    </div>
   </div>
 </main>
 
 <script>
 const STORAGE_KEY = 'handmade-events-v2';
 const applyLabels = { 'applied':'申込済','pending':'検討中','not-applied':'未申込','rejected':'落選' };
-const hotelLabels = { 'booked':'予約済','searching':'検索中','none':'未手配' };
+const hotelLabels  = { 'booked':'予約済','searching':'検索中','none':'未手配' };
 
 let events = [];
 let currentYear, currentMonth;
+let currentView   = 'list';
+let currentFilter = 'all';
 
 function loadEvents() {
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    if (s) events = JSON.parse(s);
-  } catch(e) { events = []; }
+  try { const s = localStorage.getItem(STORAGE_KEY); if (s) events = JSON.parse(s); } catch(e) { events = []; }
   if (events.length === 0) {
     const y = new Date().getFullYear();
     events = [
-      { id: 1, name: 'ハンドメイドフェスタ大阪', dateFrom: y+'-05-10', dateTo: y+'-05-11', applyStatus: 'applied', applyDate: y+'-02-15', hotelStatus: 'booked', memo: '' },
-      { id: 2, name: 'クラフトマーケット京都', dateFrom: y+'-06-20', dateTo: y+'-06-21', applyStatus: 'pending', applyDate: '', hotelStatus: 'none', memo: '去年は200ブース' },
+      { id:1, name:'ハンドメイドフェスタ大阪', dateFrom:y+'-05-10', dateTo:y+'-05-11', applyStatus:'applied',     applyDate:y+'-02-15', hotelStatus:'booked',   memo:'' },
+      { id:2, name:'クラフトマーケット京都',   dateFrom:y+'-06-20', dateTo:y+'-06-21', applyStatus:'pending',     applyDate:'',          hotelStatus:'none',     memo:'去年は200ブース' },
+      { id:3, name:'てづくり市 神戸',          dateFrom:y+'-07-05', dateTo:y+'-07-05', applyStatus:'not-applied', applyDate:'',          hotelStatus:'none',     memo:'' },
     ];
   }
 }
+function saveEvents() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); } catch(e) {} }
 
-function saveEvents() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); } catch(e) {}
-}
-
-function toYMD(d) {
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-function fmtDate(s) {
-  if (!s) return '—';
-  const [y,m,d] = s.split('-');
-  return `${y}年${parseInt(m)}月${parseInt(d)}日`;
-}
-function fmtRange(from, to) {
+function toYMD(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fmtDate(s) { if (!s) return '—'; const [y,m,d]=s.split('-'); return `${y}年${parseInt(m)}月${parseInt(d)}日`; }
+function fmtRange(from,to) {
   if (!from) return '—';
-  if (!to || from === to) return fmtDate(from);
-  const [y1,m1,d1] = from.split('-');
-  const [y2,m2,d2] = to.split('-');
-  if (y1===y2 && m1===m2) return `${y1}年${parseInt(m1)}月${parseInt(d1)}日〜${parseInt(d2)}日`;
+  if (!to||from===to) return fmtDate(from);
+  const [y1,m1,d1]=from.split('-'); const [,m2,d2]=to.split('-');
+  if (m1===m2) return `${y1}年${parseInt(m1)}月${parseInt(d1)}日〜${parseInt(d2)}日`;
   return fmtDate(from)+' 〜 '+fmtDate(to);
 }
 
-function changeMonth(d) {
-  currentMonth += d;
-  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-  if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+/* View switcher */
+function setView(v) {
+  currentView = v;
+  document.getElementById('list-view').style.display = v==='list' ? 'block' : 'none';
+  document.getElementById('cal-view').style.display  = v==='cal'  ? 'block' : 'none';
+  document.getElementById('btn-list').classList.toggle('active', v==='list');
+  document.getElementById('btn-cal').classList.toggle('active',  v==='cal');
   render();
 }
 
-function render() {
-  // Stats
+function render() { renderStats(); currentView==='list' ? renderList() : renderCalendar(); }
+
+/* Stats */
+function renderStats() {
   const total   = events.length;
   const applied = events.filter(e=>e.applyStatus==='applied').length;
   const pending = events.filter(e=>e.applyStatus==='pending').length;
@@ -313,60 +313,71 @@ function render() {
     <div class="stat"><div class="stat-num">${pending}</div><div class="stat-label">検討中</div></div>
     <div class="stat"><div class="stat-num">${hotelOk}</div><div class="stat-label">ホテル予約済</div></div>
   `;
+}
 
-  // Calendar
-  const y = currentYear, m = currentMonth;
-  document.getElementById('month-label').textContent = `${y}年${m+1}月`;
+/* List */
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+function renderList() {
+  const filtered = currentFilter==='all' ? events : events.filter(e=>e.applyStatus===currentFilter);
+  const sorted = [...filtered].sort((a,b)=>a.dateFrom.localeCompare(b.dateFrom));
+  const el = document.getElementById('event-list');
+  if (!sorted.length) { el.innerHTML='<div class="empty">該当するイベントがありません</div>'; return; }
+  el.innerHTML = sorted.map(ev=>`
+    <div class="event-card" onclick="showDetail(${ev.id})">
+      <div class="card-top">
+        <div>
+          <div class="event-name">${ev.name}</div>
+          <div class="event-date-text">${fmtRange(ev.dateFrom,ev.dateTo)}</div>
+        </div>
+        <div class="card-badges">
+          <span class="badge ${ev.applyStatus}">${applyLabels[ev.applyStatus]}</span>
+          <span class="badge hotel-${ev.hotelStatus}">${hotelLabels[ev.hotelStatus]}</span>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="card-meta-item">申込日：<span>${fmtDate(ev.applyDate)}</span></div>
+        ${ev.memo?`<div class="card-meta-item">メモ：<span>${ev.memo}</span></div>`:''}
+      </div>
+    </div>
+  `).join('');
+}
 
-  const first = new Date(y,m,1);
-  const last  = new Date(y,m+1,0);
-  const today = toYMD(new Date());
-  const cells = [];
-
-  for (let i=0;i<first.getDay();i++) {
-    const d = new Date(y,m,1-(first.getDay()-i));
-    cells.push({ date: toYMD(d), inMonth: false });
-  }
-  for (let d=1;d<=last.getDate();d++) cells.push({ date: toYMD(new Date(y,m,d)), inMonth: true });
-  while (cells.length%7!==0) {
-    const prev = cells[cells.length-1].date;
-    const nd = new Date(prev+'T00:00:00'); nd.setDate(nd.getDate()+1);
-    cells.push({ date: toYMD(nd), inMonth: false });
-  }
-
-  document.getElementById('days-grid').innerHTML = cells.map((cell,idx) => {
-    const dow = idx%7;
-    const dayNum = parseInt(cell.date.split('-')[2]);
-    const isToday = cell.date===today;
-    const cls = ['day-cell',
-      !cell.inMonth?'other-month':'',
-      isToday?'today':'',
-      dow===0?'sunday':'',
-      dow===6?'saturday':''
-    ].filter(Boolean).join(' ');
-
-    const dayEvs = events.filter(ev => {
-      const from = ev.dateFrom, to = ev.dateTo||ev.dateFrom;
-      return cell.date>=from && cell.date<=to;
-    });
-
-    const chips = dayEvs.map(ev => {
-      const isFirst = cell.date===ev.dateFrom;
-      const label = isFirst ? ev.name : '　';
-      return `<div class="ev-chip ${ev.applyStatus}${!isFirst?' cont':''}" onclick="event.stopPropagation();showDetail(${ev.id})" title="${ev.name}">${label}</div>`;
+/* Calendar */
+function changeMonth(d) {
+  currentMonth+=d;
+  if (currentMonth>11){currentMonth=0;currentYear++;}
+  if (currentMonth<0){currentMonth=11;currentYear--;}
+  renderCalendar();
+}
+function renderCalendar() {
+  const y=currentYear, m=currentMonth;
+  document.getElementById('month-label').textContent=`${y}年${m+1}月`;
+  const first=new Date(y,m,1), last=new Date(y,m+1,0), today=toYMD(new Date());
+  const cells=[];
+  for(let i=0;i<first.getDay();i++){const d=new Date(y,m,1-(first.getDay()-i));cells.push({date:toYMD(d),inMonth:false});}
+  for(let d=1;d<=last.getDate();d++) cells.push({date:toYMD(new Date(y,m,d)),inMonth:true});
+  while(cells.length%7!==0){const prev=cells[cells.length-1].date;const nd=new Date(prev+'T00:00:00');nd.setDate(nd.getDate()+1);cells.push({date:toYMD(nd),inMonth:false});}
+  document.getElementById('days-grid').innerHTML = cells.map((cell,idx)=>{
+    const dow=idx%7, dayNum=parseInt(cell.date.split('-')[2]);
+    const cls=['day-cell',!cell.inMonth?'other-month':'',cell.date===today?'today':'',dow===0?'sunday':'',dow===6?'saturday':''].filter(Boolean).join(' ');
+    const dayEvs=events.filter(ev=>{const from=ev.dateFrom,to=ev.dateTo||ev.dateFrom;return cell.date>=from&&cell.date<=to;});
+    const chips=dayEvs.map(ev=>{
+      const isFirst=cell.date===ev.dateFrom;
+      return `<div class="ev-chip ${ev.applyStatus}${!isFirst?' cont':''}" onclick="event.stopPropagation();showDetail(${ev.id})" title="${ev.name}">${isFirst?ev.name:'　'}</div>`;
     }).join('');
-
-    return `<div class="${cls}" onclick="openFormModal(null,'${cell.date}')">
-      <div class="day-num">${dayNum}</div>${chips}
-    </div>`;
+    return `<div class="${cls}" onclick="openFormModal(null,'${cell.date}')"><div class="day-num">${dayNum}</div>${chips}</div>`;
   }).join('');
 }
 
+/* Detail */
 function showDetail(id) {
-  const ev = events.find(e=>e.id===id);
-  if (!ev) return;
-  const bd = document.createElement('div');
-  bd.className='modal-backdrop';
+  const ev=events.find(e=>e.id===id); if(!ev) return;
+  const bd=document.createElement('div'); bd.className='modal-backdrop';
   bd.innerHTML=`<div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">${ev.name}</div>
     <div>
@@ -382,16 +393,14 @@ function showDetail(id) {
       <button class="btn btn-save" onclick="closeModal();openFormModal(${ev.id},null)">編集</button>
     </div>
   </div>`;
-  bd.addEventListener('click',closeModal);
-  document.body.appendChild(bd);
+  bd.addEventListener('click',closeModal); document.body.appendChild(bd);
 }
 
+/* Form */
 function openFormModal(id, dateStr) {
-  const ev = id ? events.find(e=>e.id===id) : null;
-  const isEdit = !!ev;
-  const defDate = dateStr||(ev?ev.dateFrom:'');
-  const bd = document.createElement('div');
-  bd.className='modal-backdrop';
+  const ev=id?events.find(e=>e.id===id):null, isEdit=!!ev;
+  const defDate=dateStr||(ev?ev.dateFrom:'');
+  const bd=document.createElement('div'); bd.className='modal-backdrop';
   bd.innerHTML=`<div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">${isEdit?'イベントを編集':'イベントを追加'}</div>
     <div class="form-group">
@@ -427,53 +436,28 @@ function openFormModal(id, dateStr) {
       <button class="btn btn-save" onclick="saveEvent(${id||'null'})">保存</button>
     </div>
   </div>`;
-  bd.addEventListener('click',closeModal);
-  document.body.appendChild(bd);
+  bd.addEventListener('click',closeModal); document.body.appendChild(bd);
 }
 
-function closeModal() {
-  const bd = document.querySelector('.modal-backdrop');
-  if (bd) bd.remove();
-}
+function closeModal() { const bd=document.querySelector('.modal-backdrop'); if(bd) bd.remove(); }
 
 function saveEvent(id) {
-  const name = document.getElementById('f-name').value.trim();
-  if (!name) { alert('イベント名を入力してください'); return; }
-  const data = {
-    name,
-    dateFrom:    document.getElementById('f-from').value,
-    dateTo:      document.getElementById('f-to').value,
-    applyStatus: document.getElementById('f-apply').value,
-    applyDate:   document.getElementById('f-applydate').value,
-    hotelStatus: document.getElementById('f-hotel').value,
-    memo:        document.getElementById('f-memo').value.trim(),
-  };
-  if (id) {
-    const idx = events.findIndex(e=>e.id===id);
-    events[idx] = { ...events[idx], ...data };
-  } else {
-    data.id = Date.now();
-    events.push(data);
-  }
-  saveEvents();
-  closeModal();
-  render();
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){alert('イベント名を入力してください');return;}
+  const data={name,dateFrom:document.getElementById('f-from').value,dateTo:document.getElementById('f-to').value,applyStatus:document.getElementById('f-apply').value,applyDate:document.getElementById('f-applydate').value,hotelStatus:document.getElementById('f-hotel').value,memo:document.getElementById('f-memo').value.trim()};
+  if(id){const idx=events.findIndex(e=>e.id===id);events[idx]={...events[idx],...data};}
+  else{data.id=Date.now();events.push(data);}
+  saveEvents(); closeModal(); render();
 }
 
 function deleteEvent(id) {
-  if (!confirm('このイベントを削除しますか？')) return;
-  events = events.filter(e=>e.id!==id);
-  saveEvents();
-  closeModal();
-  render();
+  if(!confirm('このイベントを削除しますか？'))return;
+  events=events.filter(e=>e.id!==id); saveEvents(); closeModal(); render();
 }
 
-// Init
-const now = new Date();
-currentYear  = now.getFullYear();
-currentMonth = now.getMonth();
-loadEvents();
-render();
+/* Init */
+const now=new Date(); currentYear=now.getFullYear(); currentMonth=now.getMonth();
+loadEvents(); render();
 </script>
 </body>
 </html>
