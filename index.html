@@ -178,6 +178,19 @@
   .detail-key { color: var(--text2); }
   .detail-val { color: var(--text); font-weight: 500; }
 
+  /* Export/Import */
+  .data-bar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 18px; }
+  .data-btn {
+    background: none; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 6px 13px; font-size: 12px; font-weight: 500; font-family: inherit;
+    color: var(--text2); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.12s;
+  }
+  .data-btn:hover { background: var(--surface); border-color: var(--border2); color: var(--text); }
+  .data-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .import-hint { font-size: 12px; color: var(--text2); margin-top: 8px; }
+  .import-hint.ok  { color: #2d5a1a; }
+  .import-hint.err { color: #b03030; }
+
   @media (max-width: 560px) {
     .stats { grid-template-columns: repeat(2, 1fr); }
     .form-row { grid-template-columns: 1fr; }
@@ -217,6 +230,17 @@
 </header>
 
 <main class="main">
+  <div class="data-bar">
+    <button class="data-btn" onclick="exportData()">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v8M4 6l3 3 3-3"/><path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2"/></svg>
+      エクスポート
+    </button>
+    <button class="data-btn" onclick="document.getElementById('import-input').click()">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 9V1M4 4l3-3 3 3"/><path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2"/></svg>
+      インポート
+    </button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
   <div class="stats" id="stats"></div>
 
   <!-- LIST VIEW -->
@@ -453,6 +477,48 @@ function saveEvent(id) {
 function deleteEvent(id) {
   if(!confirm('このイベントを削除しますか？'))return;
   events=events.filter(e=>e.id!==id); saveEvents(); closeModal(); render();
+}
+
+/* Export / Import */
+function exportData() {
+  if (!events.length) { alert('エクスポートするイベントがありません'); return; }
+  const json = JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), events }, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = `handmade-events-${date}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      const imported = parsed.events || parsed;
+      if (!Array.isArray(imported)) throw new Error('invalid');
+      const valid = imported.filter(ev => ev.id && ev.name && ev.dateFrom);
+      if (!valid.length) throw new Error('no valid events');
+      const merge = confirm(`${valid.length}件のイベントが見つかりました。\n\n「OK」→ 現在のデータに追加\n「キャンセル」→ 現在のデータを置き換え`);
+      if (merge) {
+        const existingIds = new Set(events.map(e=>e.id));
+        const newEvs = valid.filter(e=>!existingIds.has(e.id));
+        events = [...events, ...newEvs];
+        alert(`${newEvs.length}件を追加しました。`);
+      } else {
+        if (!confirm('現在のデータをすべて置き換えます。よろしいですか？')) return;
+        events = valid;
+        alert(`${valid.length}件のイベントを読み込みました。`);
+      }
+      saveEvents(); render();
+    } catch(err) {
+      alert('ファイルの読み込みに失敗しました。\n正しいエクスポートファイルを選択してください。');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 /* Init */
