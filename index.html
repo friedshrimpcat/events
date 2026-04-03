@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハンドメイドイベント管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #faf9f7;
+    --surface: #ffffff;
+    --surface2: #f4f2ee;
+    --border: #e5e2da;
+    --border2: #d0cdc4;
+    --text: #1a1916;
+    --text2: #6b6760;
+    --text3: #a09d97;
+    --accent: #c17b4a;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+  .add-btn {
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.15s;
+  }
+  .add-btn:hover { opacity: 0.82; }
+
+  /* ── Main ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ── Stats ── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .stat-num { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--text2); margin-top: 5px; }
+
+  /* ── Calendar nav ── */
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .month-nav { display: flex; align-items: center; gap: 10px; }
+  .nav-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 32px; height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text2);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+  }
+  .nav-btn:hover { background: var(--surface2); }
+  .month-label { font-size: 17px; font-weight: 700; color: var(--text); min-width: 110px; text-align: center; }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── Calendar grid ── */
+  .cal-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .dow-row { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .dow { font-size: 11px; font-weight: 500; color: var(--text2); text-align: center; padding: 9px 0; }
+  .dow:first-child { color: #c0533a; }
+  .dow:last-child { color: #3a7ec0; }
+
+  .days-grid { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); }
+  .day-cell {
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    min-height: 88px;
+    padding: 6px 5px 4px;
+    cursor: pointer;
+    transition: background 0.1s;
+    position: relative;
+  }
+  .day-cell:hover { background: var(--surface2); }
+  .day-cell:nth-child(7n) { border-right: none; }
+  .day-cell.other-month { background: #faf9f7; }
+  .day-cell.other-month .day-num { color: var(--text3); }
+
+  .day-num {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 3px;
+    flex-shrink: 0;
+  }
+  .day-cell.today .day-num { background: var(--accent); color: #fff; }
+  .day-cell.sunday .day-num { color: #c0533a; }
+  .day-cell.saturday .day-num { color: #3a7ec0; }
+  .day-cell.today .day-num { color: #fff !important; }
+
+  .ev-chip {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .ev-chip.applied   { background: #d4edbd; color: #2d5a1a; }
+  .ev-chip.pending   { background: #fde5b0; color: #6b3f0a; }
+  .ev-chip.not-applied { background: #e5e2da; color: #4a4844; }
+  .ev-chip.rejected  { background: #fcd4d4; color: #7a2020; }
+  .ev-chip.cont { opacity: 0.5; }
+
+  /* ── Modal ── */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(26,25,22,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+    padding: 16px;
+    animation: fadein 0.15s ease;
+  }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 24px;
+    width: min(480px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slidein 0.18s ease;
+  }
+  @keyframes slidein { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; display: block; font-weight: 500; }
+  .form-input, .form-select {
+    width: 100%; padding: 9px 11px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; align-items: center; }
+  .btn { border-radius: var(--radius); padding: 9px 18px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; transition: opacity 0.15s; }
+  .btn-cancel { background: none; border: 1px solid var(--border2); color: var(--text2); }
+  .btn-cancel:hover { background: var(--surface2); }
+  .btn-save { background: var(--text); color: #fff; border: none; }
+  .btn-save:hover { opacity: 0.82; }
+  .btn-delete { background: none; border: 1px solid #f0c0c0; color: #b03030; margin-right: auto; }
+  .btn-delete:hover { background: #fff0f0; }
+
+  /* Detail */
+  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: var(--text2); }
+  .detail-val { color: var(--text); font-weight: 500; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
+  .badge.applied   { background: #d4edbd; color: #2d5a1a; }
+  .badge.pending   { background: #fde5b0; color: #6b3f0a; }
+  .badge.not-applied { background: #e5e2da; color: #4a4844; }
+  .badge.rejected  { background: #fcd4d4; color: #7a2020; }
+  .badge.hotel-booked    { background: #c8ede0; color: #115038; }
+  .badge.hotel-searching { background: #fde5b0; color: #6b3f0a; }
+  .badge.hotel-none      { background: #e5e2da; color: #4a4844; }
+
+  /* Mobile */
+  @media (max-width: 520px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    .day-cell { min-height: 58px; }
+    .ev-chip { font-size: 9px; }
+    .site-header { padding: 0 16px; }
+    .main { padding: 20px 12px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><div class="logo-dot"></div>ハンドメイドイベント管理</div>
+  <button class="add-btn" onclick="openFormModal(null,null)">＋ イベントを追加</button>
+</header>
+
+<main class="main">
+  <div class="stats" id="stats"></div>
+
+  <div class="cal-header">
+    <div class="month-nav">
+      <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="month-label" id="month-label"></div>
+      <button class="nav-btn" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:#d4edbd"></div>申込済</div>
+      <div class="leg"><div class="leg-dot" style="background:#fde5b0"></div>検討中</div>
+      <div class="leg"><div class="leg-dot" style="background:#e5e2da"></div>未申込</div>
+      <div class="leg"><div class="leg-dot" style="background:#fcd4d4"></div>落選</div>
+    </div>
+  </div>
+
+  <div class="cal-wrap">
+    <div class="dow-row">
+      <div class="dow">日</div><div class="dow">月</div><div class="dow">火</div>
+      <div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow">土</div>
+    </div>
+    <div class="days-grid" id="days-grid"></div>
+  </div>
+</main>
+
+<script>
+const STORAGE_KEY = 'handmade-events-v2';
+const applyLabels = { 'applied':'申込済','pending':'検討中','not-applied':'未申込','rejected':'落選' };
+const hotelLabels = { 'booked':'予約済','searching':'検索中','none':'未手配' };
+
+let events = [];
+let currentYear, currentMonth;
+
+function loadEvents() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) events = JSON.parse(s);
+  } catch(e) { events = []; }
+  if (events.length === 0) {
+    const y = new Date().getFullYear();
+    events = [
+      { id: 1, name: 'ハンドメイドフェスタ大阪', dateFrom: y+'-05-10', dateTo: y+'-05-11', applyStatus: 'applied', applyDate: y+'-02-15', hotelStatus: 'booked', memo: '' },
+      { id: 2, name: 'クラフトマーケット京都', dateFrom: y+'-06-20', dateTo: y+'-06-21', applyStatus: 'pending', applyDate: '', hotelStatus: 'none', memo: '去年は200ブース' },
+    ];
+  }
+}
+
+function saveEvents() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); } catch(e) {}
+}
+
+function toYMD(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  const [y,m,d] = s.split('-');
+  return `${y}年${parseInt(m)}月${parseInt(d)}日`;
+}
+function fmtRange(from, to) {
+  if (!from) return '—';
+  if (!to || from === to) return fmtDate(from);
+  const [y1,m1,d1] = from.split('-');
+  const [y2,m2,d2] = to.split('-');
+  if (y1===y2 && m1===m2) return `${y1}年${parseInt(m1)}月${parseInt(d1)}日〜${parseInt(d2)}日`;
+  return fmtDate(from)+' 〜 '+fmtDate(to);
+}
+
+function changeMonth(d) {
+  currentMonth += d;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+  render();
+}
+
+function render() {
+  // Stats
+  const total   = events.length;
+  const applied = events.filter(e=>e.applyStatus==='applied').length;
+  const pending = events.filter(e=>e.applyStatus==='pending').length;
+  const hotelOk = events.filter(e=>e.hotelStatus==='booked').length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-num">${total}</div><div class="stat-label">登録イベント</div></div>
+    <div class="stat"><div class="stat-num">${applied}</div><div class="stat-label">申込済</div></div>
+    <div class="stat"><div class="stat-num">${pending}</div><div class="stat-label">検討中</div></div>
+    <div class="stat"><div class="stat-num">${hotelOk}</div><div class="stat-label">ホテル予約済</div></div>
+  `;
+
+  // Calendar
+  const y = currentYear, m = currentMonth;
+  document.getElementById('month-label').textContent = `${y}年${m+1}月`;
+
+  const first = new Date(y,m,1);
+  const last  = new Date(y,m+1,0);
+  const today = toYMD(new Date());
+  const cells = [];
+
+  for (let i=0;i<first.getDay();i++) {
+    const d = new Date(y,m,1-(first.getDay()-i));
+    cells.push({ date: toYMD(d), inMonth: false });
+  }
+  for (let d=1;d<=last.getDate();d++) cells.push({ date: toYMD(new Date(y,m,d)), inMonth: true });
+  while (cells.length%7!==0) {
+    const prev = cells[cells.length-1].date;
+    const nd = new Date(prev+'T00:00:00'); nd.setDate(nd.getDate()+1);
+    cells.push({ date: toYMD(nd), inMonth: false });
+  }
+
+  document.getElementById('days-grid').innerHTML = cells.map((cell,idx) => {
+    const dow = idx%7;
+    const dayNum = parseInt(cell.date.split('-')[2]);
+    const isToday = cell.date===today;
+    const cls = ['day-cell',
+      !cell.inMonth?'other-month':'',
+      isToday?'today':'',
+      dow===0?'sunday':'',
+      dow===6?'saturday':''
+    ].filter(Boolean).join(' ');
+
+    const dayEvs = events.filter(ev => {
+      const from = ev.dateFrom, to = ev.dateTo||ev.dateFrom;
+      return cell.date>=from && cell.date<=to;
+    });
+
+    const chips = dayEvs.map(ev => {
+      const isFirst = cell.date===ev.dateFrom;
+      const label = isFirst ? ev.name : '　';
+      return `<div class="ev-chip ${ev.applyStatus}${!isFirst?' cont':''}" onclick="event.stopPropagation();showDetail(${ev.id})" title="${ev.name}">${label}</div>`;
+    }).join('');
+
+    return `<div class="${cls}" onclick="openFormModal(null,'${cell.date}')">
+      <div class="day-num">${dayNum}</div>${chips}
+    </div>`;
+  }).join('');
+}
+
+function showDetail(id) {
+  const ev = events.find(e=>e.id===id);
+  if (!ev) return;
+  const bd = document.createElement('div');
+  bd.className='modal-backdrop';
+  bd.innerHTML=`<div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">${ev.name}</div>
+    <div>
+      <div class="detail-row"><span class="detail-key">開催日程</span><span class="detail-val">${fmtRange(ev.dateFrom,ev.dateTo)}</span></div>
+      <div class="detail-row"><span class="detail-key">申込状況</span><span class="badge ${ev.applyStatus}">${applyLabels[ev.applyStatus]}</span></div>
+      <div class="detail-row"><span class="detail-key">申込日</span><span class="detail-val">${fmtDate(ev.applyDate)}</span></div>
+      <div class="detail-row"><span class="detail-key">ホテル予約</span><span class="badge hotel-${ev.hotelStatus}">${hotelLabels[ev.hotelStatus]}</span></div>
+      ${ev.memo?`<div class="detail-row"><span class="detail-key">メモ</span><span class="detail-val">${ev.memo}</span></div>`:''}
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-delete" onclick="deleteEvent(${ev.id})">削除</button>
+      <button class="btn btn-cancel" onclick="closeModal()">閉じる</button>
+      <button class="btn btn-save" onclick="closeModal();openFormModal(${ev.id},null)">編集</button>
+    </div>
+  </div>`;
+  bd.addEventListener('click',closeModal);
+  document.body.appendChild(bd);
+}
+
+function openFormModal(id, dateStr) {
+  const ev = id ? events.find(e=>e.id===id) : null;
+  const isEdit = !!ev;
+  const defDate = dateStr||(ev?ev.dateFrom:'');
+  const bd = document.createElement('div');
+  bd.className='modal-backdrop';
+  bd.innerHTML=`<div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">${isEdit?'イベントを編集':'イベントを追加'}</div>
+    <div class="form-group">
+      <label class="form-label">イベント名</label>
+      <input class="form-input" id="f-name" placeholder="例：ハンドメイドフェスタ" value="${ev?ev.name:''}">
+    </div>
+    <div class="form-row form-group">
+      <div><label class="form-label">開始日</label><input class="form-input" id="f-from" type="date" value="${ev?ev.dateFrom:defDate}"></div>
+      <div><label class="form-label">終了日</label><input class="form-input" id="f-to" type="date" value="${ev?ev.dateTo:defDate}"></div>
+    </div>
+    <div class="form-row form-group">
+      <div>
+        <label class="form-label">申込状況</label>
+        <select class="form-select" id="f-apply">
+          ${['not-applied','pending','applied','rejected'].map(v=>`<option value="${v}" ${ev&&ev.applyStatus===v?'selected':''}>${applyLabels[v]}</option>`).join('')}
+        </select>
+      </div>
+      <div><label class="form-label">申込日</label><input class="form-input" id="f-applydate" type="date" value="${ev?ev.applyDate:''}"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ホテル予約状況</label>
+      <select class="form-select" id="f-hotel">
+        ${['none','searching','booked'].map(v=>`<option value="${v}" ${ev&&ev.hotelStatus===v?'selected':''}>${hotelLabels[v]}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">メモ</label>
+      <input class="form-input" id="f-memo" placeholder="自由にメモ" value="${ev?ev.memo:''}">
+    </div>
+    <div class="modal-actions">
+      ${isEdit?`<button class="btn btn-delete" onclick="deleteEvent(${id})">削除</button>`:''}
+      <button class="btn btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-save" onclick="saveEvent(${id||'null'})">保存</button>
+    </div>
+  </div>`;
+  bd.addEventListener('click',closeModal);
+  document.body.appendChild(bd);
+}
+
+function closeModal() {
+  const bd = document.querySelector('.modal-backdrop');
+  if (bd) bd.remove();
+}
+
+function saveEvent(id) {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('イベント名を入力してください'); return; }
+  const data = {
+    name,
+    dateFrom:    document.getElementById('f-from').value,
+    dateTo:      document.getElementById('f-to').value,
+    applyStatus: document.getElementById('f-apply').value,
+    applyDate:   document.getElementById('f-applydate').value,
+    hotelStatus: document.getElementById('f-hotel').value,
+    memo:        document.getElementById('f-memo').value.trim(),
+  };
+  if (id) {
+    const idx = events.findIndex(e=>e.id===id);
+    events[idx] = { ...events[idx], ...data };
+  } else {
+    data.id = Date.now();
+    events.push(data);
+  }
+  saveEvents();
+  closeModal();
+  render();
+}
+
+function deleteEvent(id) {
+  if (!confirm('このイベントを削除しますか？')) return;
+  events = events.filter(e=>e.id!==id);
+  saveEvents();
+  closeModal();
+  render();
+}
+
+// Init
+const now = new Date();
+currentYear  = now.getFullYear();
+currentMonth = now.getMonth();
+loadEvents();
+render();
+</script>
+</body>
+</html>
