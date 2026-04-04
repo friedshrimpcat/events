@@ -54,18 +54,28 @@
   .main { max-width: 880px; margin: 0 auto; padding: 28px 20px 60px; }
 
   /* Stats */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px; }
   .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
   .stat-num { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
   .stat-label { font-size: 11px; color: var(--text2); margin-top: 5px; }
 
   /* LIST VIEW */
-  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .list-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .filter-btn {
     font-size: 12px; padding: 5px 14px; border-radius: 999px;
     border: 1px solid var(--border); background: var(--surface);
     color: var(--text2); cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.12s;
   }
+  .sort-select {
+    font-size: 12px; padding: 5px 10px; border-radius: var(--radius);
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text2); cursor: pointer; font-family: inherit; font-weight: 500;
+    appearance: none; padding-right: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%236b6760' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+  .sort-select:focus { outline: none; border-color: var(--border2); }
   .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
 
   .event-list { display: flex; flex-direction: column; gap: 10px; }
@@ -84,8 +94,8 @@
   .badge.not-applied  { background: #e5e2da; color: #4a4844; }
   .badge.rejected     { background: #fcd4d4; color: #7a2020; }
   .badge.hotel-booked    { background: #c8ede0; color: #115038; }
-  .badge.hotel-searching { background: #fde5b0; color: #6b3f0a; }
-  .badge.hotel-none      { background: #e5e2da; color: #4a4844; }
+  .badge.hotel-no-stay   { background: #e5e2da; color: #4a4844; }
+  .badge.hotel-none      { background: #fde5b0; color: #6b3f0a; }
   .card-meta { display: flex; gap: 20px; border-top: 1px solid var(--border); padding-top: 10px; flex-wrap: wrap; }
   .card-meta-item { font-size: 12px; color: var(--text2); }
   .card-meta-item span { color: var(--text); font-weight: 500; }
@@ -192,7 +202,7 @@
   .import-hint.err { color: #b03030; }
 
   @media (max-width: 560px) {
-    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stats { grid-template-columns: repeat(3, 1fr); }
     .form-row { grid-template-columns: 1fr; }
     .day-cell { min-height: 60px; }
     .ev-chip { font-size: 9px; }
@@ -245,12 +255,20 @@
 
   <!-- LIST VIEW -->
   <div id="list-view">
-    <div class="filter-row">
-      <button class="filter-btn active" onclick="setFilter('all',this)">すべて</button>
-      <button class="filter-btn" onclick="setFilter('applied',this)">申込済</button>
-      <button class="filter-btn" onclick="setFilter('pending',this)">検討中</button>
-      <button class="filter-btn" onclick="setFilter('not-applied',this)">未申込</button>
-      <button class="filter-btn" onclick="setFilter('rejected',this)">落選</button>
+    <div class="list-controls">
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">すべて</button>
+        <button class="filter-btn" onclick="setFilter('applied',this)">申込済</button>
+        <button class="filter-btn" onclick="setFilter('pending',this)">検討中</button>
+        <button class="filter-btn" onclick="setFilter('not-applied',this)">未申込</button>
+        <button class="filter-btn" onclick="setFilter('rejected',this)">落選</button>
+      </div>
+      <select class="sort-select" id="sort-select" onchange="renderList()">
+        <option value="date-asc">日付が近い順</option>
+        <option value="date-desc">日付が遠い順</option>
+        <option value="name-asc">名前順（あ→ん）</option>
+        <option value="name-desc">名前順（ん→あ）</option>
+      </select>
     </div>
     <div class="event-list" id="event-list"></div>
   </div>
@@ -283,7 +301,7 @@
 <script>
 const STORAGE_KEY = 'handmade-events-v2';
 const applyLabels = { 'applied':'申込済','pending':'検討中','not-applied':'未申込','rejected':'落選' };
-const hotelLabels  = { 'booked':'予約済','searching':'検索中','none':'未手配' };
+const hotelLabels  = { 'booked':'予約済','no-stay':'宿泊無','none':'未手配' };
 
 let events = [];
 let currentYear, currentMonth;
@@ -297,7 +315,7 @@ function loadEvents() {
     events = [
       { id:1, name:'ハンドメイドフェスタ大阪', dateFrom:y+'-05-10', dateTo:y+'-05-11', applyStatus:'applied',     applyDate:y+'-02-15', hotelStatus:'booked',   memo:'' },
       { id:2, name:'クラフトマーケット京都',   dateFrom:y+'-06-20', dateTo:y+'-06-21', applyStatus:'pending',     applyDate:'',          hotelStatus:'none',     memo:'去年は200ブース' },
-      { id:3, name:'てづくり市 神戸',          dateFrom:y+'-07-05', dateTo:y+'-07-05', applyStatus:'not-applied', applyDate:'',          hotelStatus:'none',     memo:'' },
+      { id:3, name:'てづくり市 神戸',          dateFrom:y+'-07-05', dateTo:y+'-07-05', applyStatus:'not-applied', applyDate:'',          hotelStatus:'no-stay',  memo:'' },
     ];
   }
 }
@@ -327,15 +345,17 @@ function render() { renderStats(); currentView==='list' ? renderList() : renderC
 
 /* Stats */
 function renderStats() {
-  const total   = events.length;
-  const applied = events.filter(e=>e.applyStatus==='applied').length;
-  const pending = events.filter(e=>e.applyStatus==='pending').length;
-  const hotelOk = events.filter(e=>e.hotelStatus==='booked').length;
+  const total      = events.length;
+  const applied    = events.filter(e=>e.applyStatus==='applied').length;
+  const pending    = events.filter(e=>e.applyStatus==='pending').length;
+  const notApplied = events.filter(e=>e.applyStatus==='not-applied').length;
+  const rejected   = events.filter(e=>e.applyStatus==='rejected').length;
   document.getElementById('stats').innerHTML = `
     <div class="stat"><div class="stat-num">${total}</div><div class="stat-label">登録イベント</div></div>
     <div class="stat"><div class="stat-num">${applied}</div><div class="stat-label">申込済</div></div>
     <div class="stat"><div class="stat-num">${pending}</div><div class="stat-label">検討中</div></div>
-    <div class="stat"><div class="stat-num">${hotelOk}</div><div class="stat-label">ホテル予約済</div></div>
+    <div class="stat"><div class="stat-num">${notApplied}</div><div class="stat-label">未申込</div></div>
+    <div class="stat"><div class="stat-num">${rejected}</div><div class="stat-label">落選</div></div>
   `;
 }
 
@@ -348,7 +368,14 @@ function setFilter(f, btn) {
 }
 function renderList() {
   const filtered = currentFilter==='all' ? events : events.filter(e=>e.applyStatus===currentFilter);
-  const sorted = [...filtered].sort((a,b)=>a.dateFrom.localeCompare(b.dateFrom));
+  const sortVal = document.getElementById('sort-select')?.value || 'date-asc';
+  const sorted = [...filtered].sort((a,b)=>{
+    if (sortVal==='date-asc')  return a.dateFrom.localeCompare(b.dateFrom);
+    if (sortVal==='date-desc') return b.dateFrom.localeCompare(a.dateFrom);
+    if (sortVal==='name-asc')  return a.name.localeCompare(b.name,'ja');
+    if (sortVal==='name-desc') return b.name.localeCompare(a.name,'ja');
+    return 0;
+  });
   const el = document.getElementById('event-list');
   if (!sorted.length) { el.innerHTML='<div class="empty">該当するイベントがありません</div>'; return; }
   el.innerHTML = sorted.map(ev=>`
@@ -447,7 +474,7 @@ function openFormModal(id, dateStr) {
     <div class="form-group">
       <label class="form-label">ホテル予約状況</label>
       <select class="form-select" id="f-hotel">
-        ${['none','searching','booked'].map(v=>`<option value="${v}" ${ev&&ev.hotelStatus===v?'selected':''}>${hotelLabels[v]}</option>`).join('')}
+        ${['none','no-stay','booked'].map(v=>`<option value="${v}" ${ev&&ev.hotelStatus===v?'selected':''}>${hotelLabels[v]}</option>`).join('')}
       </select>
     </div>
     <div class="form-group">
